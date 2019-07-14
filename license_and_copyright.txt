@@ -1,0 +1,4 @@
+Real Time Animation addon
+Copyright (c) 2012 PointAtStuff
+This addon is open source under the zlib license.
+
