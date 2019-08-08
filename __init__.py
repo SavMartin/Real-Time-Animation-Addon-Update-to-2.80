@@ -3,7 +3,7 @@
 
 bl_info = {
     "name": "Real Time Animation",
-    "author": "PointAtStuff",
+    "author": "PointAtStuff Update to 2.80 by Sav Martin",
     "version": (2, 6, 0),
     "blender": (2, 80, 0),
     "location": "Menu on left side of 3D View >> Animation category",
@@ -1341,7 +1341,7 @@ class TRANSFORM_OT_rtmanim_modal_smooth_follow_logic(bpy.types.Operator):
                 else: total_matrix = obj.matrix_world
                 total_inv_q = total_matrix.to_quaternion().inverted()
                 #object local space transformation, origin_vector is a world space vector pointing to object's pivot
-                origin_vector = total_matrix*Vector((0,0,0))
+                origin_vector = total_matrix @ Vector((0,0,0))
                 location3d = region_2d_to_location_3d(context.region, context.space_data.region_3d,
                     (self._mouse_region_x, self._mouse_region_y), origin_vector)
                 
@@ -1358,7 +1358,7 @@ class TRANSFORM_OT_rtmanim_modal_smooth_follow_logic(bpy.types.Operator):
                     obj.rotation_mode = 'AXIS_ANGLE'
                 else: current_quaternion = obj.rotation_euler.to_quaternion()
                 #Below vector is in object's modified coord system. Note, (location3d-origin_vector) is in world coords.
-                location_difference_vector = current_quaternion*total_inv_q*(location3d-origin_vector)
+                location_difference_vector = current_quaternion @ total_inv_q @ (location3d-origin_vector)
                 #move by percentage of distance
                 obj.location += location_difference_vector*context.scene.rtmanim_smooth_follow_factor_property/100.0
 
@@ -1367,7 +1367,7 @@ class TRANSFORM_OT_rtmanim_modal_smooth_follow_logic(bpy.types.Operator):
                 ########################################################
                 if location_difference_vector.magnitude > 0.01 and cls.dir_unit_vector.magnitude > 0:
                     #get object's current direction vector, find additional quaternion rotation needed, rotate the object
-                    dir_unit_vector = current_quaternion*cls.dir_unit_vector
+                    dir_unit_vector = current_quaternion @ cls.dir_unit_vector
                     extra_q = dir_unit_vector.rotation_difference(location_difference_vector)
                     #rotate the object, based on the rotation mode
                     if obj.rotation_mode[0]=='Q': 
