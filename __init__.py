@@ -1337,7 +1337,7 @@ class TRANSFORM_OT_rtmanim_modal_smooth_follow_logic(bpy.types.Operator):
             #move objects
             for obj in cls.objects:
                 #useful variables
-                if context.mode=='POSE': total_matrix = context.selected_objects[0].matrix_world*obj.matrix
+                if context.mode=='POSE': total_matrix = context.selected_objects[0].matrix_world @ obj.matrix
                 else: total_matrix = obj.matrix_world
                 total_inv_q = total_matrix.to_quaternion().inverted()
                 #object local space transformation, origin_vector is a world space vector pointing to object's pivot
@@ -1371,12 +1371,12 @@ class TRANSFORM_OT_rtmanim_modal_smooth_follow_logic(bpy.types.Operator):
                     extra_q = dir_unit_vector.rotation_difference(location_difference_vector)
                     #rotate the object, based on the rotation mode
                     if obj.rotation_mode[0]=='Q': 
-                        obj.rotation_quaternion = (extra_q*obj.rotation_quaternion).normalized()
+                        obj.rotation_quaternion = (extra_q @ obj.rotation_quaternion).normalized()
                     elif obj.rotation_mode[0]=='A': 
-                        #obj.rotation_axis_angle = (extra_q*Quaternion(obj.rotation_axis_angle)).to_axis_angle()
+                        #obj.rotation_axis_angle = (extra_q @ Quaternion(obj.rotation_axis_angle)).to_axis_angle()
                         #above line doesn't work and throws an exception, so have to use the below
                         obj.rotation_mode='QUATERNION'
-                        obj.rotation_quaternion = (extra_q*obj.rotation_quaternion).normalized()
+                        obj.rotation_quaternion = (extra_q @ obj.rotation_quaternion).normalized()
                         obj.rotation_mode = 'AXIS_ANGLE'
                     else: obj.rotation_euler.rotate(extra_q)
 
